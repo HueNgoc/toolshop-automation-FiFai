@@ -24,7 +24,11 @@ class HomePage(BasePage):
         self.sort_select = page.get_by_test_id("sort")
         self.sorting_completed = page.get_by_test_id("sorting_completed")
         self.product_prices = page.get_by_test_id("product-price")
-        # TODO B2/B4 (later): price_slider_max = page.get_by_role("slider").nth(1)
+        # B2: Price slider
+        self.price_slider_max = page.get_by_role("slider").nth(1)
+
+        # B3: Footer - GitHub
+        self.github_link = page.get_by_test_id("footer-learn-github")
 
     def open(self):
         """Return only after the first product list has arrived.
@@ -46,6 +50,11 @@ class HomePage(BasePage):
         self.sort_select.select_option(value)
         return self
 
+    def filter_by_category(self, category: str):
+        """Select a product category."""
+        self.page.get_by_label(category, exact=True).check()
+        return self
+
     def product_card(self, name: str):
         # Exact name match: "Pliers" must not match "Combination Pliers".
         return self.product_names.filter(has_text=re.compile(rf"^\s*{re.escape(name)}\s*$"))
@@ -58,3 +67,14 @@ class HomePage(BasePage):
 
     def prices(self) -> list[float]:
         return [float(p.replace("$", "")) for p in self.product_prices.all_inner_texts()]
+
+    def decrease_max_price(self):
+        """Decrease maximum price by one dollar."""
+        self.price_slider_max.focus()
+        self.price_slider_max.press("ArrowLeft")
+        return self
+
+    def open_github(self):
+        """Click GitHub link in footer."""
+        self.github_link.click()
+        return self
