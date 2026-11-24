@@ -28,7 +28,9 @@ class HomePage(BasePage):
         self.price_slider_max = page.get_by_role("slider").nth(1)
 
         # B3: Footer - GitHub
-        self.github_link = page.get_by_test_id("footer-learn-github")
+        self.github_link = page.locator(
+            'footer a[href*="github.com/testsmith-io/practice-software-testing"]'
+        )
 
     def open(self):
         """Return only after the first product list has arrived.
