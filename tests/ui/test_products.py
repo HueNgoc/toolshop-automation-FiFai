@@ -1,4 +1,4 @@
-
+import os
 import pytest
 from pages.login_page import LoginPage
 from pages.account_page import AccountPage
@@ -186,9 +186,15 @@ def test_price_slider_filters_products(page):
     api_requests = []
 
     def record_request(request):
-        if "api.practicesoftwaretesting.com/products" in request.url:
+        api_url = os.getenv(
+            "API_URL",
+            "https://api.practicesoftwaretesting.com"
+        ).rstrip("/")
+
+        if request.url.startswith(f"{api_url}/products"):
             api_requests.append(request)
 
+     # Start listening for API requests
     page.on("request", record_request)
 
     # Decrease maximum price by one
@@ -270,20 +276,17 @@ def test_contact_rejects_non_empty_attachment(page, tmp_path):
 
     expect(contact.errors.first).to_be_visible()
 
+
 @pytest.mark.ui
 def test_footer_github_link_opens_new_tab(page):
-    """Goal: verify GitHub footer link opens a new tab.
-    Precondition: home page is available.
-    Expected: a new tab navigates to GitHub."""
+    """Goal: verify GitHub footer link opens a new tab."""
     home = HomePage(page).open()
 
     with page.context.expect_page() as page_info:
         home.open_github()
 
     github_page = page_info.value
-
     expect(github_page).to_have_url(
         re.compile(r"https://github\.com/")
     )
-
     github_page.close()
