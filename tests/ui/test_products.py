@@ -276,20 +276,27 @@ def test_contact_rejects_non_empty_attachment(page, tmp_path):
 
     expect(contact.errors.first).to_be_visible()
 
+
 @pytest.mark.ui
 def test_footer_github_link_opens_new_tab(page):
-    """Goal: verify GitHub footer link opens a new tab.
-    Precondition: home page is available.
-    Expected: a new tab navigates to GitHub."""
+    """Goal: verify GitHub footer link opens a new tab."""
     home = HomePage(page).open()
+
+    # Debug: inspect footer HTML in CI
+    print("PAGE URL:", page.url)
+    print("PAGE TITLE:", page.title())
+    print("FOOTER HTML:", page.locator("footer").count())
+
+    if page.locator("footer").count():
+        print("FOOTER CONTENT:", page.locator("footer").first.inner_html())
+
+    print("GITHUB LINKS:", page.locator('a[href*="github"]').count())
 
     with page.context.expect_page() as page_info:
         home.open_github()
 
     github_page = page_info.value
-
     expect(github_page).to_have_url(
         re.compile(r"https://github\.com/")
     )
-
     github_page.close()
