@@ -1,4 +1,4 @@
-
+import os
 import pytest
 from pages.login_page import LoginPage
 from pages.account_page import AccountPage
@@ -186,9 +186,15 @@ def test_price_slider_filters_products(page):
     api_requests = []
 
     def record_request(request):
-        if "api.practicesoftwaretesting.com/products" in request.url:
+        api_url = os.getenv(
+            "API_URL",
+            "https://api.practicesoftwaretesting.com"
+        ).rstrip("/")
+
+        if request.url.startswith(f"{api_url}/products"):
             api_requests.append(request)
 
+     # Start listening for API requests
     page.on("request", record_request)
 
     # Decrease maximum price by one
